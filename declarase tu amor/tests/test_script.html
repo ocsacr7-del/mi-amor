@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>script.js tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background: #f8f8f8; }
+    h1 { font-size: 18px; margin-bottom: 10px; }
+    #summary { font-weight: bold; margin-top: 10px; }
+    ul { margin-top: 10px; }
+  </style>
+  <script src="../script.js" defer></script>
+</head>
+<body>
+  <h1>script.js tests</h1>
+  <div class="container">
+    <div class="btn">
+      <a href="#" id="btn-random">NO</a>
+    </div>
+  </div>
+  <div id="summary"></div>
+  <ul id="results"></ul>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const results = [];
+      function assert(name, condition) {
+        results.push({ name, condition });
+      }
+
+      // Test 1: moverAleatoriamente directly mutates styles and keeps values in range
+      const temp = document.createElement('a');
+      document.body.appendChild(temp);
+      moverAleatoriamente(temp);
+      assert('moverAleatoriamente sets absolute position', temp.style.position === 'absolute');
+      assert('moverAleatoriamente sets bolder font weight', temp.style.fontWeight === 'bolder');
+      const t = parseFloat(temp.style.top);
+      const l = parseFloat(temp.style.left);
+      assert('top between 5% and 95%', t >= 5 && t <= 95);
+      assert('left between 5% and 95%', l >= 5 && l <= 95);
+
+      // Test 2: event listener exists and moves the button on mouseenter
+      const btn = document.querySelector('#btn-random');
+      const prevTop = btn.style.top;
+      const prevLeft = btn.style.left;
+      btn.dispatchEvent(new Event('mouseenter', { bubbles: true }));
+      assert('mouseenter updates top or left', btn.style.top !== prevTop || btn.style.left !== prevLeft);
+
+      // Render results
+      const list = document.getElementById('results');
+      let pass = 0;
+      results.forEach(r => {
+        const li = document.createElement('li');
+        li.textContent = (r.condition ? 'PASS: ' : 'FAIL: ') + r.name;
+        li.style.color = r.condition ? 'green' : 'red';
+        list.appendChild(li);
+        if (r.condition) pass++;
+      });
+      document.getElementById('summary').textContent = pass + '/' + results.length + ' tests passed';
+    });
+  </script>
+</body>
+</html>
